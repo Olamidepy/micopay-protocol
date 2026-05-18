@@ -128,7 +128,7 @@ async function seedData() {
   const existing = await db.getMany('SELECT id FROM trades LIMIT 1');
   if (existing.length > 0) return;
 
-  console.log('🌱 Seeding demo trades...');
+  app.log.info({ category: 'seed' }, '🌱 Seeding demo trades...');
   const users = await db.getMany('SELECT id FROM users');
   if (users.length < 2) {
     await db.execute("INSERT INTO users (username, stellar_address) VALUES ('juan_test', 'GBUYER...')");
@@ -165,7 +165,7 @@ async function seedData() {
       ]
     );
   }
-  console.log('✅ Seeding complete');
+  app.log.info({ category: 'seed' }, '✅ Seeding complete');
 }
 
 async function start() {

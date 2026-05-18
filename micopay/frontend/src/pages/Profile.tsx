@@ -10,9 +10,11 @@ interface ProfileProps {
   token: string | null;
   onBack: () => void;
   onDeleted: () => void;
+  onNavigatePrivacy?: () => void;
+  onNavigateTerms?: () => void;
 }
 
-const Profile = ({ token, onBack, onDeleted }: ProfileProps) => {
+const Profile = ({ token, onBack, onDeleted, onNavigatePrivacy, onNavigateTerms }: ProfileProps) => {
   const [profile, setProfile] = useState<CurrentUserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirmation, setConfirmation] = useState("");
@@ -177,6 +179,27 @@ const Profile = ({ token, onBack, onDeleted }: ProfileProps) => {
                     </span>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#67808C] mb-3">Legal</p>
+              <div className="space-y-1">
+                <button
+                  onClick={onNavigatePrivacy}
+                  className="w-full flex items-center justify-between py-2.5 text-sm text-[#0B1E26] hover:text-[#00694C] transition-colors"
+                >
+                  <span>Política de Privacidad</span>
+                  <span className="material-symbols-outlined text-base text-[#67808C]">chevron_right</span>
+                </button>
+                <div className="border-t border-[#D7E3EA]/40" />
+                <button
+                  onClick={onNavigateTerms}
+                  className="w-full flex items-center justify-between py-2.5 text-sm text-[#0B1E26] hover:text-[#00694C] transition-colors"
+                >
+                  <span>Términos de Servicio</span>
+                  <span className="material-symbols-outlined text-base text-[#67808C]">chevron_right</span>
+                </button>
               </div>
             </section>
 

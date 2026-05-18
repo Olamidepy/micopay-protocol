@@ -1,0 +1,94 @@
+interface TermsProps {
+  onBack: () => void;
+}
+
+const Terms = ({ onBack }: TermsProps) => {
+  return (
+    <div className="bg-[#F4FAFF] text-[#0B1E26] min-h-screen flex flex-col pb-10">
+      <header className="fixed top-0 left-0 w-full z-50 flex items-center gap-4 px-4 py-4 backdrop-blur-md bg-white/90 border-b border-[#D7E3EA]/60">
+        <button
+          onClick={onBack}
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#EFF6FA] transition-colors"
+          aria-label="Regresar"
+        >
+          <span className="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div>
+          <h1 className="font-bold text-lg leading-tight">Términos de Servicio</h1>
+          <p className="text-[11px] text-[#67808C]">Última actualización: mayo 2026</p>
+        </div>
+      </header>
+
+      <main className="flex-1 mt-20 px-4 pt-4 space-y-5 max-w-lg mx-auto w-full">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex items-start gap-3">
+          <span className="material-symbols-outlined text-amber-600 mt-0.5 text-lg">info</span>
+          <p className="text-sm text-amber-800 font-medium">
+            BORRADOR — Pendiente de revisión legal. No constituye asesoramiento jurídico.
+          </p>
+        </div>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">1. Aceptación de términos</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Al usar Micopay aceptas estos términos. Si no estás de acuerdo, no uses el servicio.
+            El uso de la app implica que eres mayor de edad y tienes capacidad legal para
+            celebrar transacciones financieras en tu país de residencia.
+          </p>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">2. Descripción del servicio</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Micopay es una plataforma P2P que facilita el intercambio de efectivo físico contra
+            activos digitales (XLM/USDC) usando contratos inteligentes en la red Stellar.
+            Micopay actúa como intermediario técnico, no como banco ni institución financiera.
+          </p>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">3. Responsabilidades del usuario</h2>
+          <ul className="text-sm text-[#67808C] leading-relaxed list-disc pl-5 space-y-1">
+            <li>Usar el servicio solo para transacciones legítimas</li>
+            <li>Mantener seguras tus credenciales de acceso</li>
+            <li>No usar la plataforma para lavado de dinero u otras actividades ilícitas</li>
+            <li>Verificar los datos del trade antes de confirmar</li>
+          </ul>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">4. Comisiones</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Micopay cobra una comisión de plataforma visible antes de confirmar cada transacción.
+            Las tarifas de la red Stellar (fees) son mínimas y también corren por cuenta del usuario.
+          </p>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">5. Limitación de responsabilidad</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Micopay no es responsable por pérdidas derivadas de volatilidad de precios, errores
+            del usuario, fallas de la red Stellar, o incumplimiento de la contraparte en una
+            transacción P2P. Usas el servicio bajo tu propio riesgo.
+          </p>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">6. Cancelación de cuenta</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Puedes eliminar tu cuenta en cualquier momento desde la sección de Perfil.
+            Nos reservamos el derecho de suspender cuentas que violen estos términos.
+          </p>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 border border-[#D7E3EA]/60 shadow-sm space-y-4">
+          <h2 className="font-bold text-base text-[#0B1E26]">7. Contacto</h2>
+          <p className="text-sm text-[#67808C] leading-relaxed">
+            Para dudas sobre estos términos escríbenos a legal@micopay.app.
+          </p>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default Terms;

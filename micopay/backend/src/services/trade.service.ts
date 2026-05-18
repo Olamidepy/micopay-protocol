@@ -1,5 +1,6 @@
 import db from '../db/schema.js';
 import { config } from '../config.js';
+import pino from 'pino';
 import { generateTradeSecret, encryptSecret, decryptSecret } from './secret.service.js';
 import { createHash } from 'crypto';
 import type { FastifyRequest } from 'fastify';
@@ -9,6 +10,8 @@ import {
   getTradeAuditTrail as getTradeAuditTrailRows,
   insertTradeAuditEvent,
 } from '../db/audit-log.model.js';
+
+const logger = pino({ name: 'trade.service' });
 
 // --- Trade lifecycle ---
 
@@ -73,7 +76,7 @@ async function logTransitionFailure(context: TransitionFailureContext, error: un
       metadata: transitionFailureMetadata(error, context.metadata),
     });
   } catch (auditError) {
-    console.error('[audit_log] Failed to persist failed transition', auditError);
+    logger.error({ err: auditError, category: 'trade.lifecycle', trade_id: context.tradeId }, '[audit_log] Failed to persist failed transition');
   }
 }
 

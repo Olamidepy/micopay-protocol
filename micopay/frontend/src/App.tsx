@@ -16,6 +16,8 @@ import History from "./pages/History";
 import CETESScreen from "./pages/CETESScreen";
 import BlendScreen from "./pages/BlendScreen";
 import MerchantInbox from "./pages/MerchantInbox";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Profile from "./pages/Profile";
 import BottomNav from "./components/BottomNav";
 
@@ -316,7 +318,17 @@ function App({ initialTradeId = null }: AppProps) {
             token={buyerUser?.token ?? null}
             onBack={() => setCurrentPage("home")}
             onDeleted={handleAccountDeleted}
+            onNavigatePrivacy={() => setCurrentPage("privacy")}
+            onNavigateTerms={() => setCurrentPage("terms")}
           />
+        )}
+
+        {currentPage === "privacy" && (
+          <Privacy onBack={() => setCurrentPage("profile")} />
+        )}
+
+        {currentPage === "terms" && (
+          <Terms onBack={() => setCurrentPage("profile")} />
         )}
 
         {![
@@ -327,6 +339,8 @@ function App({ initialTradeId = null }: AppProps) {
           "success",
           "cetes",
           "blend",
+          "privacy",
+          "terms",
         ].includes(currentPage) && (
           <BottomNav
             currentPage={currentPage}
