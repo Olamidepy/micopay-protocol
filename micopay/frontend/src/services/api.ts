@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { extractApiErrorPayload } from '../utils/apiError';
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -38,6 +40,49 @@ export interface TradeData {
   status: string;
   secret_hash: string;
   amount_mxn: number;
+  lock_tx_hash?: string | null;
+}
+
+export interface TradeDetailResponse {
+  trade: TradeData & {
+    lock_tx_hash?: string | null;
+    seller_id?: string;
+    buyer_id?: string;
+    created_at?: string;
+    expires_at?: string;
+  };
+  merchant_unavailable: boolean;
+  seller_username: string | null;
+}
+
+export async function fetchTradeDetail(tradeId: string, buyerToken: string): Promise<TradeDetailResponse> {
+  const res = await http.get(`/trades/${tradeId}`, authHeaders(buyerToken));
+  return res.data;
+}
+
+/** Mirrors backend `CancelTradeResult` after POST /trades/:id/cancel (#20). */
+export interface CancelTradeResponse {
+  status: 'cancelled';
+  refund_expected: boolean;
+  lock_tx_hash: string | null;
+}
+
+export async function cancelTradeRequest(tradeId: string, buyerToken: string): Promise<CancelTradeResponse> {
+  try {
+    const res = await http.post(`/trades/${tradeId}/cancel`, {}, authHeaders(buyerToken));
+    return res.data as CancelTradeResponse;
+  } catch (e: unknown) {
+    const { message } = extractApiErrorPayload(e);
+    throw new Error(message);
+  }
+}
+
+export async function patchMerchantAvailability(
+  token: string,
+  merchant_available: boolean,
+): Promise<{ merchant_available: boolean }> {
+  const res = await http.patch('/users/me', { merchant_available }, authHeaders(token));
+  return res.data.user;
 }
 
 export async function registerUser(username: string): Promise<UserData> {
@@ -51,11 +96,30 @@ export async function createTrade(
   amountMxn: number,
   buyerToken: string,
 ): Promise<TradeData> {
+  try {
+    const res = await http.post(
+      '/trades',
+      { seller_id: sellerId, amount_mxn: amountMxn },
+      authHeaders(buyerToken),
+    );
+    return res.data.trade;
+  } catch (e: unknown) {
+    const { message } = extractApiErrorPayload(e);
+    throw new Error(message);
+  }
   const res = await http.post(
     "/trades",
     { seller_id: sellerId, amount_mxn: amountMxn },
     authHeaders(buyerToken),
   );
+  return res.data.trade;
+}
+
+export async function getTrade(
+  tradeId: string,
+  token: string,
+): Promise<TradeData> {
+  const res = await http.get(`/trades/${tradeId}`, authHeaders(token));
   return res.data.trade;
 }
 
@@ -108,6 +172,7 @@ export interface TradeHistoryItem {
   lock_tx_hash: string | null;
   release_tx_hash: string | null;
   created_at: string;
+  completed_at: string | null;
   seller_id: string;
   buyer_id: string;
 }
@@ -160,6 +225,12 @@ export async function getAccountBalance(): Promise<{
 }> {
   const res = await http.get("/account/balance");
   return res.data;
+}
+
+export type Availability = 'online' | 'offline' | 'paused';
+
+export async function setAvailability(availability: Availability, token: string): Promise<void> {
+  await http.patch('/users/me/availability', { availability }, authHeaders(token));
 }
 
 // ─── DeFi: CETES ──────────────────────────────────────────────────────────
@@ -262,4 +333,38 @@ export async function blendBorrow(
 ): Promise<BlendTxResult> {
   const res = await http.post("/defi/blend/borrow", { amount, asset });
   return res.data;
+}
+
+
+export interface MerchantConfig {
+  rate_percent: number;
+  min_trade_mxn: number;
+  max_trade_mxn: number;
+  daily_cap_mxn: number;
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  stellar_address: string;
+  wallet_type?: string;
+  rate_percent?: number;
+  min_trade_mxn?: number;
+  max_trade_mxn?: number;
+  daily_cap_mxn?: number;
+}
+
+export async function getMyProfile(token: string): Promise<UserProfile> {
+  const res = await http.get('/users/me', authHeaders(token));
+  return res.data.user;
+}
+
+export async function getMerchantConfig(token: string): Promise<MerchantConfig> {
+  const res = await http.get('/merchants/me/config', authHeaders(token));
+  return res.data.config;
+}
+
+export async function updateMerchantConfig(token: string, config: MerchantConfig): Promise<MerchantConfig> {
+  const res = await http.put('/merchants/me/config', config, authHeaders(token));
+  return res.data.config;
 }

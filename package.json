@@ -2,6 +2,7 @@
   "name": "micopay-protocol",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.9.4",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -13,6 +14,7 @@
     "lint": "turbo lint"
   },
   "devDependencies": {
+    "fast-check": "^4.7.0",
     "turbo": "^2.3.3",
     "typescript": "^5.9.3",
     "vitest": "^4.1.4"

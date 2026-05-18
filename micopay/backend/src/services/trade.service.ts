@@ -12,6 +12,26 @@ import {
 
 // --- Trade lifecycle ---
 
+/** Trade states where the buyer still depends on the merchant before cash handoff / release (#31). */
+const MERCHANT_DEPENDENT_STATUSES = ['pending', 'locked', 'revealing'] as const;
+
+async function getSellerMerchantRow(sellerId: string) {
+  return db.getOne<{ username: string; merchant_available: boolean | null }>(
+    'SELECT username, merchant_available FROM users WHERE id = $1',
+    [sellerId],
+  );
+}
+
+function isMerchantUnavailableForTrade(
+  trade: { status: string },
+  sellerRow: { merchant_available: boolean | null } | null,
+) {
+  if (!MERCHANT_DEPENDENT_STATUSES.includes(trade.status as (typeof MERCHANT_DEPENDENT_STATUSES)[number])) {
+    return false;
+  }
+  return sellerRow?.merchant_available === false;
+}
+
 const STROOPS_PER_MXN = 10_000_000; // 7 decimals
 const PLATFORM_FEE_PERCENT = 0.8; // 0.8% platform fee
 const DEFAULT_TIMEOUT_MINUTES = 120; // 2 hours
@@ -57,6 +77,61 @@ async function logTransitionFailure(context: TransitionFailureContext, error: un
   }
 }
 
+const DAILY_CAP_RESET_NOTE = 'Daily cap usage resets at 00:00 UTC.';
+
+function getUtcDayRange(date = new Date()) {
+  const start = new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    0,
+    0,
+    0,
+    0,
+  ));
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+  return { start, end };
+}
+
+async function validateAgainstMerchantLimits(sellerId: string, amountMxn: number) {
+  const merchantConfig = await db.getOne(
+    `SELECT user_id, min_trade_mxn, max_trade_mxn, daily_cap_mxn
+     FROM merchant_configs
+     WHERE user_id = $1`,
+    [sellerId],
+  );
+
+  const minTrade = merchantConfig?.min_trade_mxn ?? 100;
+  const maxTrade = merchantConfig?.max_trade_mxn ?? 50000;
+  const dailyCap = merchantConfig?.daily_cap_mxn ?? 250000;
+
+  if (amountMxn < minTrade || amountMxn > maxTrade) {
+    throw new MerchantLimitError(
+      `Trade amount must be between merchant limits: ${minTrade} and ${maxTrade} MXN`,
+    );
+  }
+
+  const { start, end } = getUtcDayRange();
+  const todayTrades = await db.getMany<{ amount_mxn: number }>(
+    `SELECT amount_mxn
+     FROM trades
+     WHERE seller_id = $1
+       AND created_at >= $2
+       AND created_at < $3
+       AND status IN ('pending', 'locked', 'revealing', 'completed')`,
+    [sellerId, start.toISOString(), end.toISOString()],
+  );
+
+  const todayVolume = todayTrades.reduce((sum, t) => sum + Number(t.amount_mxn || 0), 0);
+  const projectedVolume = todayVolume + amountMxn;
+
+  if (projectedVolume > dailyCap) {
+    throw new MerchantLimitError(
+      `Daily merchant cap exceeded (${projectedVolume}/${dailyCap} MXN). ${DAILY_CAP_RESET_NOTE}`,
+    );
+  }
+}
+
 export interface CreateTradeInput {
   request: FastifyRequest;
   sellerId: string;
@@ -69,18 +144,32 @@ export async function createTrade(input: CreateTradeInput) {
   request.log.info({ seller_id: sellerId, buyer_id: buyerId, amount_mxn: amountMxn, category: 'trade.lifecycle' }, '[trade] Creating trade');
 
   if (amountMxn < 100 || amountMxn > 50000) {
-    throw new BadRequestError('amount_mxn must be between 100 and 50,000');
+    throw new ValidationError(
+      'INVALID_AMOUNT',
+      'El monto debe ser entre 100 y 50,000 MXN',
+      'amount_mxn must be between 100 and 50,000'
+    );
   }
 
   // Verify seller exists
   const seller = await db.getOne('SELECT id, stellar_address FROM users WHERE id = $1', [sellerId]);
-  if (!seller) throw new NotFoundError('Seller not found');
+  if (!seller) throw new NotFoundError('USER_NOT_FOUND', 'El usuario vendedor no existe', 'Seller not found');
 
+  // Block matching if seller is explicitly offline or paused
+  // null/undefined means legacy record — treat as online for backward compat
+  const sellerAvailability = seller.availability ?? 'online';
+  if (sellerAvailability !== 'online') {
+    throw new ConflictError(
+      `Merchant is currently ${sellerAvailability} and cannot accept new trades`,
+    );
+  }
   // Verify buyer exists
   const buyer = await db.getOne('SELECT id, stellar_address FROM users WHERE id = $1', [buyerId]);
-  if (!buyer) throw new NotFoundError('Buyer not found');
+  if (!buyer) throw new NotFoundError('USER_NOT_FOUND', 'El usuario comprador no existe', 'Buyer not found');
 
-  if (sellerId === buyerId) throw new BadRequestError('Cannot trade with yourself');
+  if (sellerId === buyerId) throw new ValidationError('INVALID_PARTICIPANTS', 'No puedes crear un intercambio contigo mismo', 'Cannot trade with yourself');
+
+  await validateAgainstMerchantLimits(sellerId, amountMxn);
 
   // Generate HTLC secret
   const { secret, secretHash } = generateTradeSecret();
@@ -131,14 +220,27 @@ export async function createTrade(input: CreateTradeInput) {
 
 export async function getTradeById(tradeId: string, userId: string) {
   const trade = await db.getOne('SELECT * FROM trades WHERE id = $1', [tradeId]);
-  if (!trade) throw new NotFoundError('Trade not found');
+  if (!trade) throw new NotFoundError('TRADE_NOT_FOUND', 'El intercambio no existe', 'Trade not found');
 
   // Only seller or buyer can view
   if (trade.seller_id !== userId && trade.buyer_id !== userId) {
-    throw new ForbiddenError('Not a participant of this trade');
+    throw new AuthError('UNAUTHORIZED_ACCESS', 'No tienes permiso para ver este intercambio', 'Not a participant of this trade', 403);
   }
 
   return trade;
+}
+
+/** Trade row for API plus flags for merchant-unavailable UX (issue #31). */
+export async function getTradeDetailForParticipant(tradeId: string, userId: string) {
+  const trade = await getTradeById(tradeId, userId);
+  const seller = await getSellerMerchantRow(trade.seller_id);
+  const merchant_unavailable = isMerchantUnavailableForTrade(trade, seller);
+
+  return {
+    trade,
+    merchant_unavailable,
+    seller_username: seller?.username ?? null,
+  };
 }
 
 export async function getActiveTrades(userId: string) {
@@ -151,16 +253,46 @@ export async function getActiveTrades(userId: string) {
   );
 }
 
-export async function getTradeHistory(userId: string) {
-  return db.getMany(
+export async function getTradeHistory(userId: string, status?: string, page = 1, limit = 20) {
+  const trades = await db.getMany(
     `SELECT id, status, amount_mxn, platform_fee_mxn, lock_tx_hash, release_tx_hash,
-            created_at, completed_at, seller_id, buyer_id
+            created_at, completed_at, seller_id, buyer_id, expires_at
      FROM trades
      WHERE (seller_id = $1 OR buyer_id = $1)
-     ORDER BY created_at DESC
-     LIMIT 20`,
+     ORDER BY created_at DESC`,
     [userId],
   );
+
+  let filtered = trades;
+  const now = new Date();
+
+  if (status && status !== 'all') {
+    if (status === 'expired') {
+      filtered = trades.filter(t =>
+        !['completed', 'cancelled'].includes(t.status) &&
+        new Date(t.expires_at) < now
+      );
+    } else {
+      filtered = trades.filter(t => t.status === status);
+    }
+  }
+
+  // Fetch usernames to provide merchant info
+  const allUsers = await db.getMany('SELECT id, username FROM users');
+  const userMap = Object.fromEntries(allUsers.map(u => [u.id, u.username]));
+
+  const mapped = filtered.map(t => {
+    const isBuyer = t.buyer_id === userId;
+    const otherPartyId = isBuyer ? t.seller_id : t.buyer_id;
+    return {
+      ...t,
+      direction: isBuyer ? 'cash-in' : 'cash-out',
+      merchant_username: userMap[otherPartyId] || 'Usuario Micopay',
+    };
+  });
+
+  const offset = (page - 1) * limit;
+  return mapped.slice(offset, offset + limit);
 }
 
 export async function lockTrade(
@@ -288,21 +420,21 @@ export async function revealTrade(request: FastifyRequest, tradeId: string, user
 export async function getTradeSecret(request: FastifyRequest, tradeId: string, userId: string, ip: string, userAgent: string) {
   request.log.info({ trade_id: tradeId, user_id: userId, category: 'trade.lifecycle' }, '[trade] Secret accessed');
   const trade = await db.getOne('SELECT * FROM trades WHERE id = $1', [tradeId]);
-  if (!trade) throw new NotFoundError('Trade not found');
+  if (!trade) throw new NotFoundError('TRADE_NOT_FOUND', 'El intercambio no existe', 'Trade not found');
 
   // Only seller can see the secret
   if (trade.seller_id !== userId) {
-    throw new ForbiddenError('Only the seller can access the secret');
+    throw new AuthError('UNAUTHORIZED_ACTION', 'Solo el vendedor puede ver el secreto', 'Only the seller can access the secret', 403);
   }
 
   // Only in revealing state
   if (trade.status !== 'revealing') {
-    throw new ConflictError(`Trade is ${trade.status}, must be revealing`);
+    throw new TradeStateError('INVALID_STATE', `El intercambio no está en estado de revelación (actual: ${trade.status})`, `Trade is ${trade.status}, must be revealing`);
   }
 
   // Check not expired
   if (new Date(trade.expires_at) < new Date()) {
-    throw new ConflictError('Trade has expired');
+    throw new TradeStateError('TRADE_EXPIRED', 'El intercambio ha expirado', 'Trade has expired');
   }
 
   // Decrypt secret
@@ -388,6 +520,81 @@ export async function completeTrade(request: FastifyRequest, tradeId: string, us
   }
 }
 
+/** Response shape for POST /trades/:id/cancel — drives refund copy on the client (#20). */
+export interface CancelTradeResult {
+  status: 'cancelled';
+  refund_expected: boolean;
+  lock_tx_hash: string | null;
+}
+
+async function finalizeTradeCancellation(tradeId: string) {
+  await db.execute(
+    `UPDATE trades
+     SET status = 'cancelled',
+         secret_enc = NULL,
+         secret_nonce = NULL
+     WHERE id = $1`,
+    [tradeId],
+  );
+}
+
+export async function cancelTrade(tradeId: string, userId: string): Promise<CancelTradeResult> {
+  const trade = await db.getOne('SELECT * FROM trades WHERE id = $1', [tradeId]);
+  if (!trade) throw new NotFoundError('Trade not found');
+
+  if (trade.seller_id !== userId && trade.buyer_id !== userId) {
+    throw new ForbiddenError('Not a participant of this trade');
+  }
+
+  const lockTx: string | null = trade.lock_tx_hash ?? null;
+
+  if (trade.status === 'pending') {
+    await finalizeTradeCancellation(tradeId);
+    return { status: 'cancelled', refund_expected: false, lock_tx_hash: lockTx };
+  }
+
+  if (trade.status === 'locked') {
+    if (trade.buyer_id === userId) {
+      await finalizeTradeCancellation(tradeId);
+      return {
+        status: 'cancelled',
+        refund_expected: Boolean(lockTx),
+        lock_tx_hash: lockTx,
+      };
+    }
+    if (trade.seller_id === userId) {
+      const seller = await getSellerMerchantRow(trade.seller_id);
+      if (!isMerchantUnavailableForTrade(trade, seller)) {
+        throw new ForbiddenError(
+          'Only the buyer may cancel a locked trade before reveal. Pause merchant availability if you need to unwind as the agent.',
+        );
+      }
+      await finalizeTradeCancellation(tradeId);
+      return {
+        status: 'cancelled',
+        refund_expected: Boolean(lockTx),
+        lock_tx_hash: lockTx,
+      };
+    }
+    throw new ForbiddenError('Not a participant of this trade');
+  }
+
+  if (trade.status === 'revealing') {
+    const seller = await getSellerMerchantRow(trade.seller_id);
+    if (!isMerchantUnavailableForTrade(trade, seller)) {
+      throw new ConflictError(
+        'Cannot cancel while the trade is in handoff. Wait for completion, or cancel only if the merchant is temporarily unavailable.',
+      );
+    }
+    await finalizeTradeCancellation(tradeId);
+    return {
+      status: 'cancelled',
+      refund_expected: Boolean(lockTx),
+      lock_tx_hash: lockTx,
+    };
+  }
+
+  throw new ConflictError(`Cannot cancel trade in status ${trade.status}.`);
 export async function cancelTrade(tradeId: string, userId: string, reason?: string) {
   let fromState = UNKNOWN_STATE;
 

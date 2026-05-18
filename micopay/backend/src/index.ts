@@ -7,6 +7,7 @@ import { userRoutes } from './routes/users.js';
 import { tradeRoutes } from './routes/trades.js';
 import { stellarRoutes } from './routes/stellar.js';
 import { defiRoutes } from './routes/defi.js';
+import { merchantRoutes } from './routes/merchants.js';
 import { AppError } from './utils/errors.js';
 import { Keypair } from '@stellar/stellar-sdk';
 
@@ -30,7 +31,7 @@ const app = Fastify({
 // CORS — Allow all origins for the hackathon deployment
 app.register(fastifyCors, { 
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
 });
 
 // JWT
@@ -49,27 +50,34 @@ try {
 // --- Global error handler ---
 app.setErrorHandler((error, request, reply) => {
   if (error instanceof AppError) {
-    reply.status(error.statusCode).send({
-      error: error.name,
-      message: error.message,
+    if (error.httpStatus >= 500) {
+      request.log.error({ err: error }, `[${error.code}] ${error.devMessage}`);
+    } else {
+      request.log.info({ err: error }, `[${error.code}] ${error.devMessage}`);
+    }
+    
+    reply.status(error.httpStatus).send({
+      code: error.code,
+      message: error.userMessage,
     });
     return;
   }
 
   // Fastify validation errors
   if (error.validation) {
+    request.log.warn({ err: error }, `Validation Error: ${error.message}`);
     reply.status(400).send({
-      error: 'ValidationError',
-      message: error.message,
+      code: 'VALIDATION_ERROR',
+      message: 'Por favor, verifica los datos ingresados.',
     });
     return;
   }
 
   // Unknown errors
-  request.log.error(error);
+  request.log.error({ err: error }, 'Unhandled Error');
   reply.status(500).send({
-    error: 'InternalServerError',
-    message: 'Something went wrong',
+    code: 'INTERNAL_ERROR',
+    message: 'Ocurrió un error inesperado. Por favor, intenta más tarde.',
   });
 });
 
@@ -111,11 +119,58 @@ app.register(userRoutes, { prefix: '' });
 app.register(tradeRoutes, { prefix: '' });
 app.register(stellarRoutes, { prefix: '' });
 app.register(defiRoutes, { prefix: '' });
+app.register(merchantRoutes, { prefix: '' });
 
 // --- Start server ---
 
+async function seedData() {
+  const db = (await import('./db/schema.js')).default;
+  const existing = await db.getMany('SELECT id FROM trades LIMIT 1');
+  if (existing.length > 0) return;
+
+  console.log('🌱 Seeding demo trades...');
+  const users = await db.getMany('SELECT id FROM users');
+  if (users.length < 2) {
+    await db.execute("INSERT INTO users (username, stellar_address) VALUES ('juan_test', 'GBUYER...')");
+    await db.execute("INSERT INTO users (username, stellar_address) VALUES ('farmacia_test', 'GSELLER...')");
+  }
+  const allUsers = await db.getMany('SELECT id FROM users');
+  const userId = allUsers[0].id;
+  const sellerId = allUsers[1].id;
+
+  const statuses = ['completed', 'cancelled', 'pending', 'locked', 'revealing'];
+  const now = new Date();
+
+  for (let i = 0; i < 20; i++) {
+    const status = statuses[i % statuses.length];
+    const amount = 150 + (i * 75);
+    const createdAt = new Date(now.getTime() - (i * 3600000 * 2));
+    const expiresAt = new Date(createdAt.getTime() + 7200000);
+    
+    await db.execute(
+      `INSERT INTO trades 
+       (seller_id, buyer_id, amount_mxn, amount_stroops, platform_fee_mxn, 
+        secret_hash, status, created_at, expires_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [
+        i % 2 === 0 ? sellerId : userId,
+        i % 2 === 0 ? userId : sellerId,
+        amount,
+        (amount * 10000000).toString(),
+        Math.ceil(amount * 0.008),
+        `hash_${i}`,
+        status,
+        createdAt,
+        expiresAt
+      ]
+    );
+  }
+  console.log('✅ Seeding complete');
+}
+
 async function start() {
   try {
+    await seedData();
     await app.listen({ port: config.port, host: '0.0.0.0' });
     app.log.info({ category: 'http', port: config.port }, '🍄 Micopay MVP Backend running');
     app.log.info({ category: 'http', mockStellar: config.mockStellar }, `Mock Stellar: ${config.mockStellar ? 'ON (no on-chain verification)' : 'OFF (real Soroban RPC)'}`);
