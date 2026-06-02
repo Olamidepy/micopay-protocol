@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import db from "../db/schema.js";
+import { toSupportCode } from "./requestId.middleware.js";
 
 /**
  * JWT authentication middleware.
@@ -9,6 +10,9 @@ export async function authMiddleware(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
+  const requestId: string = (request as any).requestId ?? "unknown";
+  const supportCode = toSupportCode(requestId);
+
   try {
     await request.jwtVerify();
 
@@ -35,7 +39,12 @@ export async function authMiddleware(
   } catch (err) {
     reply
       .status(401)
-      .send({ error: "Unauthorized", message: "Invalid or missing JWT token" });
+      .send({
+        error: "Unauthorized",
+        message: "Invalid or missing JWT token",
+        request_id: requestId,
+        support_code: supportCode,
+      });
   }
 }
 

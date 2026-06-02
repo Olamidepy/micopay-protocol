@@ -100,6 +100,9 @@ app.register(fastifyJwt, {
   secret: config.jwtSecret,
 });
 
+// Correlation ID — must be registered before any route / error handler reads request.log
+registerRequestId(app);
+
 // Rate limit (optional — gracefully skip if not available)
 try {
   const rateLimit = await import('@fastify/rate-limit');
@@ -110,16 +113,21 @@ try {
 
 // --- Global error handler ---
 app.setErrorHandler((error, request, reply) => {
+  const requestId: string = (request as any).requestId ?? reply.getHeader('x-request-id') ?? 'unknown';
+  const supportCode = toSupportCode(requestId);
+
   if (error instanceof AppError) {
     if (error.httpStatus >= 500) {
       request.log.error({ err: error }, `[${error.code}] ${error.devMessage}`);
     } else {
       request.log.info({ err: error }, `[${error.code}] ${error.devMessage}`);
     }
-    
+
     reply.status(error.httpStatus).send({
       code: error.code,
       message: error.userMessage,
+      request_id: requestId,
+      support_code: supportCode,
     });
     return;
   }
@@ -130,6 +138,8 @@ app.setErrorHandler((error, request, reply) => {
     reply.status(400).send({
       code: 'VALIDATION_ERROR',
       message: 'Por favor, verifica los datos ingresados.',
+      request_id: requestId,
+      support_code: supportCode,
     });
     return;
   }
@@ -139,6 +149,8 @@ app.setErrorHandler((error, request, reply) => {
   reply.status(500).send({
     code: 'INTERNAL_ERROR',
     message: 'Ocurrió un error inesperado. Por favor, intenta más tarde.',
+    request_id: requestId,
+    support_code: supportCode,
   });
 });
 

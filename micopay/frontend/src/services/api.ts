@@ -66,8 +66,7 @@ export async function cancelTradeRequest(tradeId: string, buyerToken: string): P
     const res = await http.post(`/trades/${tradeId}/cancel`, {}, authHeaders(buyerToken));
     return res.data as CancelTradeResponse;
   } catch (e: unknown) {
-    const { message } = extractApiErrorPayload(e);
-    throw new Error(message);
+    throw toApiError(extractApiErrorPayload(e));
   }
 }
 
@@ -129,8 +128,7 @@ export async function createTrade(
     );
     return res.data.trade;
   } catch (e: unknown) {
-    const { message } = extractApiErrorPayload(e);
-    throw new Error(message);
+    throw toApiError(extractApiErrorPayload(e));
   }
 }
 
