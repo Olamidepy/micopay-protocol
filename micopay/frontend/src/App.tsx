@@ -206,9 +206,11 @@ function MapRoute() {
 
 function ChatRoute() {
   const navigate = useNavigate();
-  const { lockTxHash } = useAppCtx();
+  const { lockTxHash, activeTrade, buyerUser } = useAppCtx();
   return (
       <ChatRoom
+          tradeId={activeTrade?.id ?? ''}
+          userId={buyerUser?.id ?? ''}
           lockTxHash={lockTxHash}
           onBack={() => navigate('/map')}
           onViewQR={() => navigate('/qr-reveal')}
@@ -218,9 +220,11 @@ function ChatRoute() {
 
 function ChatDepositRoute() {
   const navigate = useNavigate();
-  const { lockTxHash } = useAppCtx();
+  const { lockTxHash, activeTrade, buyerUser } = useAppCtx();
   return (
       <DepositChat
+          tradeId={activeTrade?.id ?? ''}
+          userId={buyerUser?.id ?? ''}
           lockTxHash={lockTxHash}
           onBack={() => navigate('/map-deposit')}
           onViewQR={() => navigate('/qr-deposit')}
@@ -246,9 +250,11 @@ function QRRevealRoute() {
 
 function QRDepositRoute() {
   const navigate = useNavigate();
-  const { activeTrade, buyerUser, setReleaseTxHash } = useAppCtx();
+  const { activeTrade, buyerUser } = useAppCtx();
   return (
       <DepositQR
+          activeTrade={activeTrade}
+          buyerToken={buyerUser?.token ?? null}
           onBack={() => navigate('/chat-deposit')}
           onChat={() => navigate('/chat-deposit')}
           onSuccess={() => navigate('/success')}
@@ -258,7 +264,7 @@ function QRDepositRoute() {
 
 function SuccessRoute() {
   const navigate = useNavigate();
-  const { flow, activeTrade, lockTxHash, releaseTxHash, buyerUser, resetTradeFlow } = useAppCtx();
+  const { flow, activeTrade, lockTxHash, releaseTxHash, buyerUser, sellerUser, activeAmount, resetTradeFlow } = useAppCtx();
   const [tradeDetail, setTradeDetail] = useState<TradeHistoryItem | null>(null);
   const [sellerUsername, setSellerUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

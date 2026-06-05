@@ -182,8 +182,9 @@ export interface CompleteTradeResponse {
 export async function completeTrade(
     tradeId: string,
     buyerToken: string,
-): Promise<void> {
-  await http.post(`/trades/${tradeId}/complete`, {}, authHeaders(buyerToken));
+): Promise<CompleteTradeResponse> {
+  const res = await http.post(`/trades/${tradeId}/complete`, {}, authHeaders(buyerToken));
+  return res.data;
 }
 
 export interface RefundTradeResponse {
@@ -403,6 +404,36 @@ export async function getMerchantConfig(token: string): Promise<MerchantConfig> 
 export async function updateMerchantConfig(token: string, config: MerchantConfig): Promise<MerchantConfig> {
   const res = await http.put('/merchants/me/config', config, authHeaders(token));
   return res.data.config;
+}
+
+type QueueFn = (type: string, payload: unknown) => Promise<string>;
+
+export async function updateMerchantConfigWithOfflineSupport(
+  token: string,
+  config: MerchantConfig,
+  queueFn: QueueFn,
+): Promise<{ config: MerchantConfig; queued: boolean }> {
+  try {
+    const updated = await updateMerchantConfig(token, config);
+    return { config: updated, queued: false };
+  } catch {
+    await queueFn('config', { config });
+    return { config, queued: true };
+  }
+}
+
+export async function updateMerchantAvailabilityWithOfflineSupport(
+  token: string,
+  available: boolean,
+  queueFn: QueueFn,
+): Promise<{ queued: boolean }> {
+  try {
+    await patchMerchantAvailability(token, available);
+    return { queued: false };
+  } catch {
+    await queueFn('availability', { available });
+    return { queued: true };
+  }
 }
 
 // ─── Merchant discovery (#102) ────────────────────────────────────────────
