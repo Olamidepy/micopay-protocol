@@ -5,6 +5,8 @@
 > Stellar Hacks: Agents — DoraHacks 2026  
 > **Drips Wave 4 contributors** → focus is the retail mobile app in `micopay/frontend` + `micopay/backend`. Jump to [Contributing](#contributing-drips-wave-4) · [Milestones](https://github.com/ericmt-98/micopay-protocol/milestones) · [Open issues](https://github.com/ericmt-98/micopay-protocol/issues) · [`docs/`](./docs/)
 
+> 🔐 **Next up — Real-World ZK on Stellar.** MicoPay is heading into the upcoming **Zero-Knowledge proof hackathon** with **ZKaaS** already live on testnet: anonymous, pay-per-use ZK verification on Soroban. You can already prove *"my reputation tier is ≥ GOLD"* without revealing who you are — verified on-chain. See [ZK-as-a-Service](#-zk-as-a-service-zkaas) below.
+
 ---
 
 ## What is MicoPay?
@@ -92,6 +94,40 @@ Every action costs a small x402 micropayment — this is what keeps the feed sig
 > **Demo scope**: The Bazaar today coordinates Stellar ↔ Stellar swaps. True cross-chain (ETH/BTC/SOL) requires an off-chain watcher that reads the published secret from Soroban and claims the counterpart chain — that relayer is the next milestone after the AtomicSwapHTLC contract (37 tests, deployed).
 
 The architecture is designed so that once the relayer is live, any agent on any chain can broadcast an intent and get matched to a MicoPay provider — walking their user to physical MXN cash in Mexico without ever touching a CEX or a bridge.
+
+---
+
+## 🔐 ZK-as-a-Service (ZKaaS)
+
+> **Heading into the upcoming Real-World ZK on Stellar hackathon — and already live on testnet.**
+
+MicoPay's reputation used to be public: exact scores and badges tied to your Stellar address. That's surveillance. ZKaaS adds the **private mode**: prove a claim about yourself without revealing your identity, address, or history.
+
+**Your reputation, your choice — flaunt it publicly (badge) or prove it privately (ZK).**
+
+ZKaaS is a generic, pay-per-use zero-knowledge verification service: a single Soroban contract (`ZkVerifierRegistry`) holds a registry of audited verification keys, and any agent pays cents via x402 to verify a Noir/UltraHonk proof on-chain.
+
+### Verified on-chain (Stellar testnet)
+
+- **Contract `ZkVerifierRegistry`:** `CC6YHSKDTINV4XSZNVT42XW4GPJIANNKNNKG73HYTO2OJ7DPF55A33UG`
+- **Demo B — anonymous reputation:** alice proved *tier ≥ SILVER* (she's GOLD) **without revealing her identity**. Verified on-chain, tx [`330be3e4…02974`](https://stellar.expert/explorer/testnet/tx/330be3e4eae61901526206d33438e38e5b90a65d16871ef1727d5bc075902974)
+
+### Two registered circuits
+
+| Circuit | What it proves | Role |
+|---|---|---|
+| `poseidon_preimage` | "I know the secret behind this hash" — without revealing it | Building block for HTLC coordination and cross-chain swaps |
+| `reputation_v1` 🏆 | "My reputation tier is ≥ T" — without revealing identity, address, or exact score | **Flagship.** Private reputation earned in MicoPay, consumed by merchants and AI agents |
+
+### Why a VK registry (not one contract per circuit)
+
+UltraHonk verification is bound to a circuit via its verification key. A registry keyed by `circuit_id` makes ZKaaS an actual *service*: new circuits are **registered, not redeployed**. It's also the security boundary — the API never accepts a caller-supplied VK (that would let an attacker forge `verified: true` with a trivial circuit). Only the admin registers audited VKs.
+
+### The agent use case
+
+> An AI agent pays **$0.001** to verify that an anonymous counterparty has good reputation *before* locking funds in escrow — without doxxing anyone. Trust, bought autonomously, on-chain.
+
+Built with **Noir + UltraHonk (barretenberg)**, verified inside Soroban via the BN254/Poseidon host functions (Protocol 25/26). Full spec: [`docs/ZK-as-a-Service/README.md`](./docs/ZK-as-a-Service/README.md) · toolchain pins: [`TOOLCHAIN.md`](./TOOLCHAIN.md).
 
 ---
 
@@ -185,6 +221,7 @@ curl -X POST http://localhost:3000/api/v1/demo/run
 | Scan agent intents | `GET /api/v1/bazaar/feed` | $0.001 | Access to live market data / arbitrage opportunities |
 | Send private quote | `POST /api/v1/bazaar/quote` | $0.002 | Direct negotiation channel between agents |
 | Initiate cash exchange | `POST /api/v1/cash/request` | $0.01 | HTLC lock on Soroban + QR generation + merchant notification |
+| Verify ZK proof | `POST /api/v1/zk/verify` | $0.001 | On-chain UltraHonk verification — prove reputation/knowledge without revealing identity |
 | Fund MicoPay | `POST /api/v1/fund` | $0.10 | Meta-demo: the protocol funds itself |
 | Service discovery | `GET /api/v1/services` | free | Full catalog with prices, examples, and why_pay explanations |
 | Agent skill | `GET /skill.md` | free | SKILL.md for Claude / OpenAI tool use autodiscovery |
@@ -318,6 +355,7 @@ cd micopay/contracts/escrow && cargo test
 - `MicopayEscrow`: `CBQINHLR3M7NZAPQY7EJ3TWOE22R57LMFDVEMOK3C3X7ZIBFWHVQQP3A`
 - `AtomicSwapHTLC A`: `CCDOUXIXSFXT2HTJAJGFNUJN6CKCYX2M6AL2BHHPEF6ISNHP2BGLS4KX`
 - `AtomicSwapHTLC B`: `CBLCGG44QQILWEIVBXDSZSLH7NI7SGJQKXQ7WTKP3W3YSXOBTGMZKSNN`
+- `ZkVerifierRegistry`: `CC6YHSKDTINV4XSZNVT42XW4GPJIANNKNNKG73HYTO2OJ7DPF55A33UG` — ZKaaS, 2 circuits registered (`poseidon_preimage` + `reputation_v1`)
 
 ### AtomicSwapHTLC — `contracts/atomic-swap`
 
@@ -362,7 +400,8 @@ Contracts reviewed against the Soroban security checklist:
 
 | Timeline | Feature |
 |---|---|
-| **Today** | Stellar testnet — full 6-step agent flow, real on-chain Soroban HTLC; CETES/Blend UI with mainnet-ready architecture |
+| **Today** | Stellar testnet — full 6-step agent flow, real on-chain Soroban HTLC; CETES/Blend UI with mainnet-ready architecture; **ZKaaS live** — anonymous reputation proofs verified on-chain |
+| **Next hackathon (Real-World ZK on Stellar)** | Harden ZKaaS: more circuits in the registry, ZK-gated Bazaar matching, private HTLC pre-image commitments, judges' demo of agent-buys-trust flow |
 | **1–3 months** | Telegram bot integration, production merchant onboarding CDMX, live CETES rate from Etherfuse API |
 | **3–6 months** | AtomicSwapHTLC live: ETH/BTC → MXN cash (no bridges, no custodians); Etherfuse SPEI on-ramp |
 | **6–12 months** | WhatsApp integration, mainnet launch, 100+ merchants CDMX |
