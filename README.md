@@ -424,16 +424,7 @@ MicoPay is participating in **Stellar Drips Wave 6**. Contributions are scoped t
 
 **From single-device demo to a real product.** Today the app simulates both sides of a trade on one phone. Wave 6 makes it real: **one identity per device** and a **real transaction between two phones**, with the UI showing the user's own data instead of hardcoded placeholders.
 
-The full plan, prioritized findings, issue queue, and acceptance criteria live in **[`docs/AUDIT_APK_WAVE6.md`](./docs/AUDIT_APK_WAVE6.md)** — read it before picking up work. Work is grouped in stages:
-
-- **Stage 0 (internal, done):** backend build green + CI gate so `main` can't break again.
-- **Stage 1 (P0):** one identity per device, real counterparty, real balance, APK fetch fix.
-- **Stage 2 (P1):** the UI stops showing invented data (map, economics, names, FX).
-- **Stage 3:** backend hardening for a real server.
-- **Stage 4:** product/release decisions (DeFi labeling, APK release config).
-- **Research (parallel, no code):** 5 market/user validation issues (`research` label).
-
-If you are unsure where to start, pick a `complexity: low` issue from Stage 1 or Stage 2.
+The full plan, prioritized findings, issue queue, and acceptance criteria live in **[`docs/AUDIT_APK_WAVE6.md`](./docs/AUDIT_APK_WAVE6.md)** — read it before picking up work. The milestones below organize that work; every milestone (Backend Hardening, Merchant Operations, Frontend Quality, Store Readiness, Documentation) exists to make the core retail flow trustworthy. If you are unsure where to start, pick an issue from **Core Retail Flow** first.
 
 ### In-scope paths
 
@@ -452,22 +443,21 @@ If you are unsure where to start, pick a `complexity: low` issue from Stage 1 or
 
 1. Read [`docs/AUDIT_APK_WAVE6.md`](./docs/AUDIT_APK_WAVE6.md) — **the Wave 6 plan**: findings, issue queue, stages, and acceptance criteria.
 2. Read [`docs/PRODUCT_SCOPE.md`](./docs/PRODUCT_SCOPE.md) — what we are building and why.
-3. Read [`docs/UX_MANIFESTO.md`](./docs/UX_MANIFESTO.md) — the trust and UX bar every PR is reviewed against.
-4. Read [`docs/DRIPS_TEAM_GUIDE.md`](./docs/DRIPS_TEAM_GUIDE.md) — how issues, reviews, and merges work during the Wave.
-5. Pick a Wave 6 issue from the queue once it's published. The queue (with surface, track, and complexity per issue) lives in `AUDIT_APK_WAVE6.md` §6.2; issues are being opened from that plan — check [open issues](https://github.com/ericmt-98/micopay-protocol/issues).
+3. Read [`docs/RETAIL_ROADMAP.md`](./docs/RETAIL_ROADMAP.md) — the phased execution plan.
+4. Read [`docs/UX_MANIFESTO.md`](./docs/UX_MANIFESTO.md) — the trust and UX bar every PR is reviewed against.
+5. Read [`docs/DRIPS_TEAM_GUIDE.md`](./docs/DRIPS_TEAM_GUIDE.md) — how issues, reviews, and merges work during the Wave.
+6. Pick an issue from the [open milestones](https://github.com/ericmt-98/micopay-protocol/milestones).
 
-### Wave 6 work, by stage
+### Milestones
 
-The Wave 6 issue queue (`AUDIT_APK_WAVE6.md` §6) maps every issue to a stage, surface (`wave:frontend`/`wave:backend`), track, and complexity. High level:
-
-| Stage | Focus |
+| Milestone | Focus |
 |---|---|
-| Stage 0 (internal, done) | Backend build green + CI gate — `main` can't break again |
-| Stage 1 — Core (P0) | One identity per device, real counterparty, real balance, APK fetch fix |
-| Stage 2 — UI truth (P1) | Map, economics, names, FX use real data instead of placeholders |
-| Stage 3 — Backend hardening | Prod config fail-fast, no in-memory fallback, reproducible migrations, real health |
-| Stage 4 — Product / release | DeFi labeling decision, APK release config |
-| Research (parallel) | 5 market/user validation issues — `research` label, no PR, privacy-first |
+| [Core Retail Flow](https://github.com/ericmt-98/micopay-protocol/milestone/2) | **Wave priority.** Trade creation, detail view, state machine UX, cancel / timeout / refund, receipts, history linked to real states |
+| [Backend Hardening](https://github.com/ericmt-98/micopay-protocol/milestone/7) | Auth persistence, audit log, error taxonomy, rate limiting, replay protection, structured logging |
+| [Merchant Operations](https://github.com/ericmt-98/micopay-protocol/milestone/3) | Merchant onboarding, profile, availability, limits, trade inbox |
+| [Frontend Quality](https://github.com/ericmt-98/micopay-protocol/milestone/4) | Empty states, a11y pass, loading skeletons — polish outside the core flow |
+| [Store Readiness](https://github.com/ericmt-98/micopay-protocol/milestone/6) | Account deletion, privacy, support path, reviewer mode, store compliance |
+| [Documentation](https://github.com/ericmt-98/micopay-protocol/milestone/8) | Per-folder READMEs, env docs, local setup |
 
 ### Labels we use
 
