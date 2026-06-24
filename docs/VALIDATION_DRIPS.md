@@ -111,7 +111,13 @@ _(no responses yet)_
 _(no responses yet)_
 
 ### V-9 · Safety meeting in person
-_(no responses yet)_
+First-person response (privacy-safe):
+
+- Country / general region: India / South Asia.
+- Comfort meeting a stranger to exchange cash: Neutral. I would not say I am fully comfortable, but I could do it if the meeting place, timing, and person all felt trustworthy.
+- Biggest safety fear: My main fear would be getting scammed or robbed during the exchange. I would also be cautious about fake cash, someone changing the location at the last minute, or being followed after leaving.
+- What would make it feel safe: I would feel much better meeting in a busy public place during the day. Verified profiles, ratings, in-app chat, clear receipts, and a way to contact support would also make the exchange feel more controlled.
+- Preference for known shops over individuals: Yes. I would prefer a known shop because it feels more accountable and easier to find again if something goes wrong. Meeting a random individual feels more uncertain to me.
 
 ### V-10 · Product validation: repeat use & provider discovery
 > Note: submitted in the earlier multi-respondent format (kept as-is). Newer entries are first-person.
