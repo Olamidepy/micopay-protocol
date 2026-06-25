@@ -108,17 +108,11 @@ es ahora deployable. Los P0 de frontend son el siguiente foco.
   el usuario actual). El endpoint `/account/balance` deja de usar `platformSecretKey` para la
   Home o se reemplaza por un endpoint explícito de saldo de usuario.
 
-### P0-4 · Fetch con ruta relativa roto dentro del APK
-- **Archivo:** `micopay/frontend/src/pages/Home.tsx:61-69`
-- **Qué pasa:** usa `fetch('/api/merchants/me/trades?state=pending')` con **ruta relativa**.
-  El resto de la app usa el cliente axios `http` con `baseURL = VITE_API_URL` (`api.ts:5-7`).
-  En el WebView de Capacitor, `/api/...` resuelve contra el origen de la app (`https://localhost`
-  / esquema de la app), no contra el backend.
-- **Por qué importa:** el badge de "operaciones pendientes" del comerciante **no carga en el
-  dispositivo** (funciona solo en web por el proxy de dev).
-- **Criterio de aceptación:** la llamada usa el helper de API con `baseURL` (p. ej.
-  `getMerchantTrades(token, 'pending')` ya existe en `api.ts:226-232`). Cero rutas relativas
-  `/api/...` en el código de pantallas.
+### ~~P0-4 · Fetch con ruta relativa roto dentro del APK~~ ✅ Resuelto
+- **Resuelto por:** [@josealfredo79](https://github.com/josealfredo79) · **Issue:** #150 · **PR:** #154 · **Mergeado:** 2026-06-25
+- ~~`fetch('/api/merchants/me/trades?state=pending')` con ruta relativa roto en Capacitor~~
+- **Fix:** reemplazado con `getMerchantTrades(merchantToken, 'pending')` del cliente axios. Se creó
+  `Home.test.tsx` desde cero con 5 casos cubriendo args correctos, token nulo, badge, estado vacío y error.
 
 ---
 
@@ -134,13 +128,11 @@ es ahora deployable. Los P0 de frontend son el siguiente foco.
   (`m.distance_km`, `m.payout_mxn`, `m.rate_percent`). `formatDistance`/`walkMinutes` (ya
   presentes en el archivo) se usan con la distancia real.
 
-### P1-2 · El mapa muestra pines inventados, no los comercios reales
-- **Archivo:** `micopay/frontend/src/components/MapSim.tsx:32-79`
-- **Qué pasa:** renderiza 3 pines fijos (Farmacia Guadalupe, @carlos_g, Centro Lavado) con
-  posiciones CSS hardcodeadas. No recibe ni grafica los comercios reales ni sus `lat/lng`.
-- **Criterio de aceptación:** el mapa grafica los comercios devueltos por `useMerchantsAvailable`
-  en su posición real (o, si se mantiene la simulación visual para el hackathon, etiquetarla
-  claramente como ilustrativa y no como ubicaciones reales).
+### ~~P1-2 · El mapa muestra pines inventados, no los comercios reales~~ ✅ Resuelto
+- **Resuelto por:** [@Gozirimdev](https://github.com/Gozirimdev) · **Issue:** #152 · **PR:** #156 · **Mergeado:** 2026-06-25
+- ~~3 pines fijos hardcodeados en `MapSim.tsx`~~
+- **Fix:** `getMerchantPins(merchants)` proyecta `lat/lng` reales de la API a posiciones CSS,
+  con clamp al rango 12–88% para mantenerlos dentro del viewport.
 
 ### P1-3 · Nombres de agente hardcodeados en el recibo
 - **Archivo:** `micopay/frontend/src/App.tsx:345`
@@ -148,21 +140,23 @@ es ahora deployable. Los P0 de frontend son el siguiente foco.
   El nombre real del comercio (disponible en `seller_username` vía `fetchTradeDetail`) no se usa.
 - **Criterio de aceptación:** el recibo muestra el `seller_username` real del trade.
 
-### P1-4 · Tipo de cambio XLM→MXN hardcodeado
-- **Archivo:** `micopay/frontend/src/pages/Home.tsx:71-76`
-- **Qué pasa:** `parseFloat(...) * 20` fijo ("demo rate"). No hay oráculo ni feed.
-- **Criterio de aceptación:** el tipo de cambio viene de una fuente del backend (endpoint de
-  rate / oráculo). Si no hay fuente aún, etiquetar el valor como aproximado/demo en la UI.
+### ~~P1-4 · Tipo de cambio XLM→MXN hardcodeado~~ ✅ Resuelto
+- **Resuelto por:** [@josealfredo79](https://github.com/josealfredo79) · **Issue:** #161 · **PR:** #162 · **Mergeado:** 2026-06-25
+- ~~`parseFloat(...) * 20` fijo ("demo rate")~~
+- **Fix:** nuevo `GET /rate/xlm-mxn` en `routes/rate.ts` llama a CoinGecko (free, sin API key,
+  timeout 5 s, 503 si upstream falla). Frontend usa `getXlmMxnRate()` con `useEffect` cancelable;
+  muestra `"—"` mientras carga y `~×20` con tilde si hay error.
+- ⚠️ **Follow-up pendiente (P2-4):** el endpoint no tiene caché — cada render de Home dispara
+  una llamada a CoinGecko. Ver §5 P2-4.
 
 ---
 
 ## 5. Hallazgos P2 — Endurecimiento de release
 
-### P2-1 · Sin gate de CI (riesgo de regresión)
-- **Hecho:** no existe `.github/workflows/`. La regresión previa (main sin compilar) ocurrió
-  justamente por mergear sin gate.
-- **Criterio de aceptación:** workflow que corra `tsc --noEmit` + `vite build` (y `vitest run`)
-  en cada PR a `main`, bloqueando merge si falla.
+### ~~P2-1 · Sin gate de CI (riesgo de regresión)~~ ✅ Resuelto
+- **Resuelto:** 2026-06-25 · `.github/workflows/ci.yml`
+- Corre `npm run build` en backend y `tsc + vite build` en frontend en cada PR a `main`.
+  `vitest` en modo informativo (`continue-on-error: true`) hasta que P0/P1 estabilicen los tests.
 
 ### P2-2 · DeFi (CETES / Blend) totalmente simulado
 - **Archivos:** `api.ts:285-374` (`simulated: boolean`), pantallas `CETESScreen.tsx`,
@@ -172,6 +166,15 @@ es ahora deployable. Los P0 de frontend son el siguiente foco.
   (`showDefi={!isDemoMode || !isMockStellar}` en `App.tsx:368-374`).
 - **Criterio de aceptación:** ningún flujo presenta una transacción simulada como real sin
   etiqueta visible.
+
+### P2-4 · `/rate/xlm-mxn` sin caché — riesgo de rate-limit CoinGecko
+- **Archivo:** `micopay/backend/src/routes/rate.ts`
+- **Qué pasa:** cada vez que `Home` monta hace una llamada directa a CoinGecko. El free tier
+  permite ~50 req/min por IP. Con varios usuarios simultáneos o recargas frecuentes, el servidor
+  puede quedar bloqueado y todos los usuarios verían el fallback `~×20` al mismo tiempo.
+- **Criterio de aceptación:** el endpoint guarda la última tasa en memoria con TTL de 60 s.
+  Si el TTL no expiró, responde el valor cacheado sin tocar CoinGecko. Si CoinGecko falla y
+  hay un valor previo en caché (aunque vencido), devolverlo con `stale: true` en lugar de 503.
 
 ### P2-3 · Configuración de release incompleta
 - **Push notifications:** `build.gradle:67-74` aplica `google-services` solo si existe
@@ -213,10 +216,11 @@ lo demás.
 | ~~P0-4~~ | ~~Fix fetch relativo en APK~~ | — | — | — | — | ✅ **Resuelto** — issue #150 cerrado, PR #154 mergeado |
 | P0-3 | Saldo real de la wallet del usuario | `wave:frontend`,`wave:backend` | `wave:retail` | medium | ✅ | Depende de P0-1 |
 | P0-5 | Onboarding mínimo: alias + respaldo de clave obligatorio (KYC Nivel 0) | `wave:frontend` | `wave:trust` | medium | ✅ | Sienta base para KYC por niveles (D-4) · pendiente pregunta 3 §9 |
-| ~~P1-1~~ | ~~ExploreMap usa economía real~~ | — | — | — | — | Issue #151 publicado (abierto, sin asignar) |
+| ~~P1-2~~ | ~~Mapa grafica comercios reales~~ | — | — | — | — | ✅ **Resuelto** — PR #156 · @Gozirimdev |
+| P1-1 | ExploreMap usa economía real | `wave:frontend` | `wave:retail` | medium | ✅ | Issue #151 publicado, abierto sin asignar |
 | P1-3 | Nombre real del agente en recibo | `wave:frontend` | `wave:retail` | low | ✅ | `ux` · depende de P0-2 (trade real) |
-| ~~P1-2~~ | ~~Mapa grafica comercios reales~~ | — | — | — | — | ✅ **Resuelto** — issue #152 cerrado, PR #156 mergeado |
-| P1-4 | Tipo de cambio XLM→MXN real | `wave:frontend`,`wave:backend` | `wave:retail` | medium | ✅ | Necesita endpoint de rate |
+| ~~P1-4~~ | ~~Tipo de cambio XLM→MXN real~~ | — | — | — | — | ✅ **Resuelto** — PR #162 · @josealfredo79 · follow-up: P2-4 caché |
+| P2-4 | Caché en-memoria para `/rate/xlm-mxn` | `wave:backend` | `wave:retail` | low | ✅ | Follow-up de P1-4 — ver §5 P2-4 |
 | B-3 | Desactivar fallback in-memory en prod | `wave:backend` | `wave:trust` | medium | — | **Interno** — `initPg()` aún silencioso; no publicar como Drips |
 | B-4 | No sembrar datos demo en prod | `wave:backend` | `wave:trust` | low | — | **Interno** — `seedData()` sin flag; no publicar como Drips |
 | B-7 | Health/readiness real (DB + config) | `wave:backend` | `wave:trust` | medium | — | **Interno** — `/health` parcial; no publicar como Drips |
@@ -248,30 +252,28 @@ lo demás.
 
 ### 6.3 Orden recomendado de publicar → asignar → mergear
 
-**Etapa 0 — Desbloqueo (interno, antes de abrir a contribuidores):**
-1. **B-1** backend build verde — sin esto nada se valida end-to-end.
-2. **P2-1** CI gate (frontend + backend) — protege todo merge posterior. Mergear apenas B-1 esté.
+**Etapa 0 — Desbloqueo (interno) ✅ COMPLETA:**
+1. ~~**B-1**~~ ✅ backend build verde.
+2. ~~**P2-1**~~ ✅ CI gate `.github/workflows/ci.yml`.
 
-**Etapa 1 — Núcleo "un usuario real, una transacción real" (P0):**
-3. **P0-1 + P0-2** (un solo PR/epic: identidad única + contraparte real). Decisiones D-1 y D-2 ya
-   cierran el alcance; resolver pregunta §9.3 (backup) antes de asignar P0-5.
-4. **P0-4** en paralelo (trivial, independiente).
-5. **P0-3** después de P0-1 (saldo por-usuario necesita identidad única).
-6. **P0-5** tras P0-1 (onboarding mínimo + respaldo de clave; KYC Nivel 0). Depende de §9.3.
+**Etapa 1 — Núcleo "un usuario real, una transacción real" (P0):** 🔄 En curso
+3. **P0-1 + P0-2** (issue #160, asignado en Drips) — en curso.
+4. ~~**P0-4**~~ ✅ PR #154 · @josealfredo79.
+5. **P0-3** — espera a que P0-1 aterrice.
+6. **P0-5** — espera resolución §9.3 (nivel de backup obligatorio).
 
-**Etapa 2 — "la UI deja de mentir" (P1, paralelizable entre contribuidores):**
-7. **P1-1** y **P1-2** (independientes, frontend puro).
-8. **P1-3** (tras P0-2) y **P1-4** (tras endpoint de rate).
+**Etapa 2 — "la UI deja de mentir" (P1):** 🔄 Parcialmente completa
+7. ~~**P1-2**~~ ✅ PR #156 · @Gozirimdev. **P1-1** (issue #151, abierto sin asignar).
+8. ~~**P1-4**~~ ✅ PR #162 · @josealfredo79. **P1-3** espera P0-2. **P2-4** (caché rate) listo para publicar.
 
-**Etapa 3 — Backend hardening (tras B-1, paralelizable):**
-9. **B-2, B-3, B-4, B-6, B-7**.
+**Etapa 3 — Backend hardening (interno):**
+9. **B-3, B-4, B-7** — trabajo interno pendiente. ~~B-2~~✅ ~~B-6~~✅
 
 **Etapa 4 — Decisiones de producto / release:**
-10. **P2-2** y **P2-3** (requieren decisión de producto primero).
+10. ~~**P2-2**~~ cerrado #86. ~~**P2-3**~~ cerrado #89.
 
-**Etapa paralela — Research (V-1…V-10, en cualquier momento):**
-- Las 10 de validación corren **en paralelo a todo** y ya están publicadas (milestone #18). Cada
-  asignado entrega por **PR** (su sección en `VALIDATION_DRIPS.md`). El label `research` ya existe.
+**Etapa paralela — Research (V-1…V-10):** 🔄 9/10 completas
+- ~~V-1~~✅ ~~V-2~~✅ **V-3** 🔴 sin PR. ~~V-4~~✅ ~~V-5~~✅ ~~V-6~~✅ ~~V-7~~✅ ~~V-8~~✅ ~~V-9~~✅ ~~V-10~~✅
 
 ### 6.4 Política de asignación y merge (de `DRIPS_TEAM_GUIDE.md`)
 
@@ -303,18 +305,18 @@ transacción. Las respuestas usan solo país/región general y relatos anonimiza
 
 ### Los 10 issues (publicados, milestone #18)
 
-| ID | Tema | Issue | Qué valida (SDF) |
-|----|------|-------|------------------|
-| V-1 | Cash-out | #131 | Demanda (digital → efectivo) |
-| V-2 | Cash-in / depósito | #132 | Demanda bidireccional |
-| V-3 | Proveedor de liquidez | #133 | Oferta |
-| V-4 | Onboarding no-custodial | #134 | Stellar self-custody usable |
-| V-5 | Confianza en el flujo | #135 | Confianza / PMF |
-| V-6 | Remesas | #138 | Demanda de remesas cross-border |
-| V-7 | Alternativas y switching | #139 | Diferenciación |
-| V-8 | Comisión justa | #140 | Economía unitaria (% sin montos) |
-| V-9 | Seguridad en persona | #141 | De-risk P2P |
-| V-10 | Recurrencia y descubrimiento | #142 | Retención / PMF |
+| ID | Tema | Issue | Qué valida (SDF) | Estado |
+|----|------|-------|------------------|--------|
+| V-1 | Cash-out | #131 | Demanda (digital → efectivo) | ✅ PR #155 · @larryjay007 |
+| V-2 | Cash-in / depósito | #132 | Demanda bidireccional | ✅ PR #159 · @Truphile (integrado manual) |
+| V-3 | Proveedor de liquidez | #133 | Oferta | 🔴 Sin PR — brecha crítica |
+| V-4 | Onboarding no-custodial | #134 | Stellar self-custody usable | ✅ PR #157 · @Shadow-MMN |
+| V-5 | Confianza en el flujo | #135 | Confianza / PMF | ✅ PR #158 · @Truphile (integrado manual) |
+| V-6 | Remesas | #138 | Demanda de remesas cross-border | ✅ PR #146 · @KaruG1999 |
+| V-7 | Alternativas y switching | #139 | Diferenciación | ✅ PR #145 · @barnabasolutayo-lgtm |
+| V-8 | Comisión justa | #140 | Economía unitaria (% sin montos) | ✅ PR #148 · @rosemary21 |
+| V-9 | Seguridad en persona | #141 | De-risk P2P | ✅ PR #147 · @deep-bhikadiya |
+| V-10 | Recurrencia y descubrimiento | #142 | Retención / PMF | ✅ PR #143 · @attyolu |
 
 Las preguntas completas (en primera persona) viven en cada issue.
 
