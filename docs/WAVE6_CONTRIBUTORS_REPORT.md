@@ -15,14 +15,18 @@
 
 | PR | GitHub user | Issue closed | Validation topic | Region | Status |
 |----|-------------|-------------|-----------------|--------|--------|
+| [#155](https://github.com/ericmt-98/micopay-protocol/pull/155) | [@larryjay007](https://github.com/larryjay007) | #131 | V-1 · Cash-out context | Nigeria (South West) | ✅ Merged |
+| [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) | [@Truphile](https://github.com/Truphile) | #132 | V-2 · Cash-in / deposit context | Nigeria (West Africa) | ✅ Merged |
+| [#157](https://github.com/ericmt-98/micopay-protocol/pull/157) | [@Shadow-MMN](https://github.com/Shadow-MMN) | #134 | V-4 · Non-custodial wallet onboarding | — | ✅ Merged |
+| [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) | [@Truphile](https://github.com/Truphile) | #135 | V-5 · Trust in the cash-in/cash-out flow | Nigeria (West Africa) | ✅ Merged |
 | [#143](https://github.com/ericmt-98/micopay-protocol/pull/143) | [@attyolu](https://github.com/attyolu) | #142 | V-10 · Repeat use & provider discovery | Mexico / LATAM | ✅ Merged |
 | [#145](https://github.com/ericmt-98/micopay-protocol/pull/145) | [@barnabasolutayo-lgtm](https://github.com/barnabasolutayo-lgtm) | #139 | V-7 · Current alternatives & switching | Monterrey MX / Bogotá CO / Buenos Aires AR / Caracas VE | ✅ Merged |
 | [#146](https://github.com/ericmt-98/micopay-protocol/pull/146) | [@KaruG1999](https://github.com/KaruG1999) | #138 | V-6 · Remittances cash-out context | Argentina | ✅ Merged |
 | [#147](https://github.com/ericmt-98/micopay-protocol/pull/147) | [@deep-bhikadiya](https://github.com/deep-bhikadiya) | #141 | V-9 · Safety meeting in person | India / South Asia | ✅ Merged |
 | [#148](https://github.com/ericmt-98/micopay-protocol/pull/148) | [@rosemary21](https://github.com/rosemary21) | #140 | V-8 · Fair commission / fee tolerance | Nigeria (Lagos area) | ✅ Merged |
 
-**Total responses so far: N=8** (1 multi-respondent batch in V-10 + 4 first-person + 3 implicit in V-7 batch)
-**Regions represented:** Mexico, Colombia, Argentina, Venezuela, India, Nigeria
+**Total responses: N=12** (V-1, V-2, V-4, V-5 first-person + 1 multi-respondent batch in V-10 + 4 first-person V-6/V-8/V-9 + 3 implicit in V-7 batch)
+**Regions represented:** Nigeria (×3), Mexico, Colombia, Argentina, Venezuela, India
 
 ---
 
@@ -32,17 +36,91 @@ Each contribution advances one or more of the five claims in our funding narrati
 
 | SDF Claim | Issues that back it | Responses in so far | Gap |
 |-----------|--------------------|--------------------|-----|
-| **1. Demand exists** (people need cash ↔ digital conversion) | V-1, V-2, V-6 | V-6 ✅ (KaruG1999) | V-1 and V-2 still open |
-| **2. Supply exists** (providers would offer cash for a commission) | V-3 | None yet | V-3 unassigned |
+| **1. Demand exists** (people need cash ↔ digital conversion) | V-1, V-2, V-6 | V-1 ✅ (larryjay007) · V-2 ✅ (Truphile) · V-6 ✅ (KaruG1999) | Fully covered (3 responses) |
+| **2. Supply exists** (providers would offer cash for a commission) | V-3 | None yet | V-3 unassigned — **🔴 critical gap** |
 | **3. MicoPay can win** (better than current options, at an acceptable fee) | V-7, V-8 | V-7 ✅ (barnabasolutayo-lgtm) · V-8 ✅ (rosemary21) | Both covered |
-| **4. Stellar is usable** (mainstream users can handle non-custodial wallets) | V-4 | None yet | V-4 assigned to @Shadow-MMN, no PR yet |
-| **5. Trust & PMF** (users feel safe, would return, would recommend) | V-5, V-9, V-10 | V-9 ✅ (deep-bhikadiya) · V-10 ✅ (attyolu) | V-5 assigned to @Truphile, no PR yet |
+| **4. Stellar is usable** (mainstream users can handle non-custodial wallets) | V-4 | V-4 ✅ (Shadow-MMN) | Covered |
+| **5. Trust & PMF** (users feel safe, would return, would recommend) | V-5, V-9, V-10 | V-5 ✅ (Truphile) · V-9 ✅ (deep-bhikadiya) · V-10 ✅ (attyolu) | Fully covered (3 responses) |
 
-> **Priority to unlock:** V-1 (cash-out demand) and V-3 (liquidity supply) — the two core sides of the market. Without at least one response each, the funding case is missing its foundation.
+> **Only remaining gap:** V-3 (liquidity provider perspective) — the supply side of the market. Without a first-person provider viewpoint, the SDF supply-side argument is unsubstantiated.
 
 ---
 
 ## Detailed contribution entries
+
+---
+
+### V-1 · Cash-out context
+**Contributor:** [@larryjay007](https://github.com/larryjay007) · **PR:** [#155](https://github.com/ericmt-98/micopay-protocol/pull/155) · **Merged:** 2026-06-25
+
+**Format:** First-person, single respondent.
+
+**Region:** Nigeria (South West)
+
+**Key findings:**
+
+- **Cash-out frequency:** Weekly — a recurring, non-occasional need.
+- **Current method:** Peer-to-peer exchange or bank transfer to a local account, followed by ATM withdrawal or POS agent.
+- **Main friction:** High cumulative transaction fees, unreliable ATM availability, and daily withdrawal limits.
+- **Lived experience:** Spent over an hour visiting three bank locations due to empty ATMs and network failures. When a working ATM was finally found, the daily withdrawal limit forced multiple transactions and additional bank charges.
+
+**SDF narrative contribution:** Adds Nigeria (South West) to the cash-out demand signal for Claim 1. Weekly frequency + ATM reliability failures + withdrawal limits combine into a strong recurring pain that a local P2P agent network directly addresses.
+
+---
+
+### V-2 · Cash-in / deposit context
+**Contributor:** [@Truphile](https://github.com/Truphile) · **PR:** [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) · **Merged:** 2026-06-25
+
+**Format:** First-person, single respondent.
+
+**Region:** Nigeria (West Africa)
+
+**Key findings:**
+
+- **Why cash-in matters:** Collecting paper cash from offline gigs or friends makes it impossible to pay digital bills (AWS, utility tokens, fintech savings). Cash-in = unblocking access to the digital economy.
+- **Current method:** Walk to a neighborhood PoS agent, hand over physical cash, provide account details, wait for a transfer to the digital wallet via the agent's terminal.
+- **Frequency:** A few times a month — whenever physical cash accumulates.
+- **Main trust barrier:** Network failures mid-transaction. The fear is handing over cash and hearing "network is bad, the money hasn't dropped yet." A reversal can take 24–48 hours.
+- **Local trusted providers:** Yes — established, branded kiosks tied to a permanent physical location. Reputation accountability makes them trustworthy.
+
+**SDF narrative contribution:** Confirms bidirectional demand (Claim 1) from West Africa. The cash-in direction mirrors the cash-out demand of V-1. The key UX risk to address: mid-operation network failure and confirmation latency must have an immediate in-app status solution.
+
+---
+
+### V-4 · Non-custodial wallet onboarding
+**Contributor:** [@Shadow-MMN](https://github.com/Shadow-MMN) · **PR:** [#157](https://github.com/ericmt-98/micopay-protocol/pull/157) · **Merged:** 2026-06-25
+
+**Format:** First-person UX audit of the current MicoPay app.
+
+**Key findings:**
+
+- **Key custody clarity:** Not clear at all. No onboarding screen exists — keypair was generated silently and only discoverable via browser localStorage inspection.
+- **Biggest fear:** Losing the key to a hacker since it is stored in localStorage without any user-visible protection.
+- **Minimum to build trust:** A dedicated first-launch screen explaining that a wallet was created, showing the public key, and prompting the user to back up the secret key.
+- **Create vs import:** Preference for importing an existing Stellar key — user already has funds elsewhere and doesn't want the friction of moving balances.
+- **Backup mandatory vs optional:** Optional, but the UI must make it trivially easy (single tap to copy + prominent safety note). Mandatory backup frustrates trial users; invisible backup frustrates serious users.
+
+**SDF narrative contribution:** First direct UX audit of the onboarding flow for Claim 4 (Stellar is usable). The verdict is clear: the current app does not meet the minimum bar for a non-technical user. The findings give the team a concrete, actionable checklist: onboarding screen → key display → copy-to-backup flow.
+
+---
+
+### V-5 · Trust in the cash-in/cash-out flow
+**Contributor:** [@Truphile](https://github.com/Truphile) · **PR:** [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) · **Merged:** 2026-06-25
+
+**Format:** First-person, single respondent.
+
+**Region:** Nigeria (West Africa)
+
+**Key findings:**
+
+- **Most trusted provider type:** A well-established, branded neighborhood PoS kiosk with a steady stream of customers and a dedicated Android PoS terminal.
+- **Least trusted:** A mobile, unbranded agent on a street corner with just a phone, or one claiming "network is bad" before even attempting the transaction.
+- **Minimum info before handing over cash:** (1) Exact commission fee stated upfront · (2) Final locked-in value that will reflect in the wallet · (3) Clear on-screen confirmation that the agent's system is active and online.
+- **Verification signals needed:** Agent's location and banner matching the in-app map listing + a "Trusted Agent" badge or high completion-rate indicator.
+- **Support expectation mid-failure:** Immediate automated SMS receipt or in-app "Pending / Money Received" status · a WhatsApp support channel or toll-free line resolving hanging transactions within minutes.
+- **Top abandonment trigger:** Any delay at point of payment — "network is fluctuating" or slow QR code/receipt generation triggers fear of trapped funds.
+
+**SDF narrative contribution:** Maps the trust and abandonment signals directly to Claim 5 (Trust / PMF). The three-part checklist — transparent fee, locked rate, online status — is a concrete UX requirement the agent flow must satisfy before cash changes hands. Combined with V-2, this builds the complete Nigeria trust picture.
 
 ---
 
@@ -152,16 +230,22 @@ Each contribution advances one or more of the five claims in our funding narrati
 Across Nigeria, Venezuela, Mexico, Colombia, and Argentina, respondents independently converge on the same range. Anything above 5% loses to the traditional channel — even for people with very limited access. This gives MicoPay a concrete, defensible pricing constraint.
 
 ### 2. Trust is not optional — it's the feature
-Every respondent across every topic mentioned trust signals as a prerequisite: verified profiles, ratings, in-app chat, receipts, support access. This is not a "nice to have" for the UX — it is the product's core value proposition alongside low fees.
+Every respondent across every topic mentioned trust signals as a prerequisite: verified profiles, ratings, in-app chat, receipts, support access. This is not a "nice to have" for the UX — it is the product's core value proposition alongside low fees. V-5 (Truphile) gives the sharpest articulation: three non-negotiable signals must appear before cash changes hands — transparent fee, locked rate, and online status confirmation.
 
 ### 3. The last mile is the real problem, even for Stellar users
 The Argentina respondent (V-6) already uses Stellar for cross-border transfers and still can't get cash locally without P2P counterparty risk. MicoPay's value isn't the blockchain — it's the trusted, local, same-day cash delivery.
 
 ### 4. The "no bank account required" argument is the strongest unlock
-Named explicitly by Nigeria (V-8) and implied by Venezuela (V-7). For sub-Saharan Africa and hyper-inflationary LATAM economies, eliminating bank account dependency is more compelling than any fee argument.
+Named explicitly by Nigeria (V-8) and implied by Venezuela (V-7) and confirmed directionally by V-2 (Truphile): digital cash-in is the gateway to the digital economy for people whose income arrives in paper. For sub-Saharan Africa and hyper-inflationary LATAM economies, eliminating bank account dependency is more compelling than any fee argument.
 
-### 5. Geographic diversity de-risks the SDF case
-Responses now span 6 countries across 3 continents (LATAM, South Asia, Africa). The convergence of pain points and preferences across such different markets strengthens the case that this is a structural problem — not a local quirk — and that Stellar's infrastructure can solve it globally.
+### 5. The wallet onboarding is currently broken — V-4 proves it
+Shadow-MMN's audit (V-4) found the app generates a keypair silently, stores it in localStorage with no user notification, and has no backup prompt. This is a critical gap for Claim 4. The fix is well-defined: first-launch onboarding screen → public key display → one-tap secret key backup. This must ship before any SDF demo.
+
+### 6. Network failure at the moment of cash transfer is the #1 trust killer
+Both V-2 and V-5 (West Africa) independently identify the same abandonment trigger: handing over physical cash and then hearing "network is bad." This points to a single, high-priority product requirement — real-time transaction status feedback (SMS or in-app) must be immediate and unambiguous, with a clear resolution path (WhatsApp / toll-free line).
+
+### 7. Geographic diversity de-risks the SDF case
+Responses now span 6+ countries across 3 continents (LATAM, South Asia, Africa). The convergence of pain points and preferences across such different markets strengthens the case that this is a structural problem — not a local quirk — and that Stellar's infrastructure can solve it globally.
 
 ---
 
@@ -185,9 +269,9 @@ Responses now span 6 countries across 3 continents (LATAM, South Asia, Africa). 
 - **First-person** entries reflect each contributor's own lived experience — not a survey of others.
 - **Convenience sample**, self-selected via Stellar Drips Wave 6. Directional and qualitative, not statistically representative.
 - **Privacy-first:** no names, no contact information, no transaction amounts, no wallet addresses.
-- Current sample size: **N=8 individual perspectives** across **6 countries / 3 regions**.
+- Current sample size: **N=12 individual perspectives** across **6+ countries / 3 regions**.
 - Report `N` plainly. Let the cross-regional consistency of the patterns speak for itself.
 
 ---
 
-*Last updated: 2026-06-24 · Maintainer: [@ericmt-98](https://github.com/ericmt-98)*
+*Last updated: 2026-06-25 · Maintainer: [@ericmt-98](https://github.com/ericmt-98)*
