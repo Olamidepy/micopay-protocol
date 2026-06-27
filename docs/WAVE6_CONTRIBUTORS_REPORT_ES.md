@@ -16,21 +16,22 @@
 | PR | Usuario de GitHub | Issue cerrado | Tema validado | Región | Estado |
 |----|-------------------|--------------|--------------|--------|--------|
 | [#155](https://github.com/ericmt-98/micopay-protocol/pull/155) | [@larryjay007](https://github.com/larryjay007) | #131 | V-1 · Contexto de cash-out | Nigeria (Sur Oeste) | ✅ Mergeado |
-| [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) | [@Truphile](https://github.com/Truphile) | #132 | V-2 · Contexto de cash-in / depósito | Nigeria (África Occidental) | ✅ Mergeado |
+| [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) | [@Truphile](https://github.com/Truphile) | #132 | V-2 · Contexto de cash-in / depósito | Nigeria (África Occidental) | ✅ Integrado |
 | [#157](https://github.com/ericmt-98/micopay-protocol/pull/157) | [@Shadow-MMN](https://github.com/Shadow-MMN) | #134 | V-4 · Onboarding a wallet no-custodial | — | ✅ Mergeado |
-| [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) | [@Truphile](https://github.com/Truphile) | #135 | V-5 · Confianza en el flujo de cash-in/cash-out | Nigeria (África Occidental) | ✅ Mergeado |
+| [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) | [@Truphile](https://github.com/Truphile) | #135 | V-5 · Confianza en el flujo de cash-in/cash-out | Nigeria (África Occidental) | ✅ Integrado |
 | [#143](https://github.com/ericmt-98/micopay-protocol/pull/143) | [@attyolu](https://github.com/attyolu) | #142 | V-10 · Reuso y descubrimiento de proveedores | México / LATAM | ✅ Mergeado |
 | [#145](https://github.com/ericmt-98/micopay-protocol/pull/145) | [@barnabasolutayo-lgtm](https://github.com/barnabasolutayo-lgtm) | #139 | V-7 · Alternativas actuales y switching | Monterrey MX / Bogotá CO / Buenos Aires AR / Caracas VE | ✅ Mergeado |
 | [#146](https://github.com/ericmt-98/micopay-protocol/pull/146) | [@KaruG1999](https://github.com/KaruG1999) | #138 | V-6 · Contexto de remesas y cash-out | Argentina | ✅ Mergeado |
 | [#147](https://github.com/ericmt-98/micopay-protocol/pull/147) | [@deep-bhikadiya](https://github.com/deep-bhikadiya) | #141 | V-9 · Seguridad en reunión presencial | India / Sur de Asia | ✅ Mergeado |
 | [#148](https://github.com/ericmt-98/micopay-protocol/pull/148) | [@rosemary21](https://github.com/rosemary21) | #140 | V-8 · Tolerancia a comisiones y tarifas | Nigeria (área de Lagos) | ✅ Mergeado |
 | [#169](https://github.com/ericmt-98/micopay-protocol/pull/169) | [@DevSolex](https://github.com/DevSolex) | #133 | V-3 · Perspectiva del proveedor de liquidez | Nigeria (África Occidental) | ✅ Mergeado |
-| [#171](https://github.com/ericmt-98/micopay-protocol/pull/171) | [@Jo-anny](https://github.com/Jo-anny) | #166 | V-13 · Contexto del remitente — envío al exterior | Europa → América Latina | ✅ Mergeado |
+| [#171](https://github.com/ericmt-98/micopay-protocol/pull/171) | [@Jo-anny](https://github.com/Jo-anny) | #166 | V-13 · Contexto del remitente — envío al exterior | Europa → América Latina | ✅ Integrado |
 | [#173](https://github.com/ericmt-98/micopay-protocol/pull/173) | [@Oluwasuyi-Timilehin](https://github.com/Oluwasuyi-Timilehin) | #165 | V-12 · Vida sin cuenta bancaria — gestión diaria de efectivo | México (CDMX) | ✅ Mergeado |
-| [#170](https://github.com/ericmt-98/micopay-protocol/pull/170) | [@Max-Owolabi](https://github.com/Max-Owolabi) | #167 | V-14 · Validación: modelo mental de stablecoin y peso digital | Nigeria (África Occidental) | ✅ Mergeado |
+| [#175](https://github.com/ericmt-98/micopay-protocol/pull/175) | [@Max-Owolabi](https://github.com/Max-Owolabi) | #167 | V-14 · Validación: modelo mental de stablecoin y peso digital | Nigeria (África Occidental) | ✅ Integrado |
+| [#174](https://github.com/ericmt-98/micopay-protocol/pull/174) | [@Chigybillionz](https://github.com/Chigybillionz) | #164 | V-11 · Transacción fallida / disputa y recuperación | Nigeria (África Occidental) | ✅ Integrado |
 
-**Total de respuestas: N=16** (V-1, V-2, V-3, V-4, V-5, V-12, V-13, V-14 en primera persona + 1 lote multi-respondente en V-10 + 3 primera persona V-6/V-8/V-9 + 3 implícitas en el lote de V-7)
-**Regiones representadas:** Nigeria (×5), México (×2), Colombia, Argentina, Venezuela, India, Europa
+**Total de respuestas: N=17** (V-1, V-2, V-3, V-4, V-5, V-11, V-12, V-13, V-14 en primera persona + 1 lote multi-respondente en V-10 + 3 primera persona V-6/V-8/V-9 + 3 implícitas en el lote de V-7)
+**Regiones representadas:** Nigeria (×6), México (×2), Colombia, Argentina, Venezuela, India, Europa
 
 ---
 
@@ -43,10 +44,10 @@ Cada contribución avanza uno o más de los cinco argumentos de nuestra narrativ
 | **1. Existe demanda** (la gente necesita convertir efectivo ↔ digital) | V-1, V-2, V-6 | V-1 ✅ (larryjay007) · V-2 ✅ (Truphile) · V-6 ✅ (KaruG1999) | Cubierto por completo (3 respuestas) |
 | **2. Existe oferta** (proveedores darían efectivo por una comisión) | V-3 | V-3 ✅ (DevSolex) | Cubierto — proveedor individual en Nigeria |
 | **3. MicoPay puede ganar** (mejor que las alternativas actuales, a una tarifa aceptable) | V-7, V-8 | V-7 ✅ (barnabasolutayo-lgtm) · V-8 ✅ (rosemary21) | Ambos cubiertos |
-| **4. Stellar es usable** (usuarios normales pueden manejar wallets no-custodiales) | V-4 | V-4 ✅ (Shadow-MMN) | Cubierto |
-| **5. Confianza y PMF** (usuarios se sienten seguros, regresarían y recomendarían) | V-5, V-9, V-10 | V-5 ✅ (Truphile) · V-9 ✅ (deep-bhikadiya) · V-10 ✅ (attyolu) | Cubierto por completo (3 respuestas) |
+| **4. Stellar es usable** (usuarios normales pueden manejar wallets no-custodiales) | V-4, V-14 | V-4 ✅ (Shadow-MMN) · V-14 ✅ (Max-Owolabi) | Cubierto (2 respuestas) |
+| **5. Confianza y PMF** (usuarios se sienten seguros, regresarían y recomendarían) | V-5, V-9, V-10, V-11 | V-5 ✅ (Truphile) · V-9 ✅ (deep-bhikadiya) · V-10 ✅ (attyolu) · V-11 ✅ (Chigybillionz) | Cubierto por completo (4 respuestas) |
 
-> **Los 5 argumentos SDF tienen cobertura.** La brecha de la oferta (V-3) fue cerrada por DevSolex. Los issues de validación abiertos (V-11, V-12, V-14, V-15) fortalecen el deck pero no son bloqueantes para el caso de financiamiento.
+> **Los 5 argumentos SDF tienen cobertura.** La brecha de la oferta (V-3) fue cerrada por DevSolex. El único issue de validación abierto es **V-15** (umbral de confianza de primera vez); fortalece el deck pero no es bloqueante para el caso de financiamiento.
 
 ---
 
@@ -306,6 +307,25 @@ Cada contribución avanza uno o más de los cinco argumentos de nuestra narrativ
 
 ---
 
+### V-11 · Transacción fallida / disputa y recuperación
+**Contribuidor:** [@Chigybillionz](https://github.com/Chigybillionz) · **PR:** [#174](https://github.com/ericmt-98/micopay-protocol/pull/174) · **Integrado:** 2026-06-27
+
+**Formato:** Primera persona, respondente único.
+
+**Región:** Nigeria (África Occidental)
+
+**Hallazgos principales:**
+
+- **La falla:** Una transferencia banco-a-banco falló en el último paso — justo después de ingresar el OTP correcto — devolviendo solo un error genérico "failed" sin explicación.
+- **Ruta de recuperación:** Sin recuperación in-app. El respondente recurrió a su red informal (un familiar le envió efectivo) para completar la compra original.
+- **Tiempo de resolución:** Más de una semana y aún sin resolver; la única ruta de escalamiento es visitar la sucursal física, que aún no había ocurrido.
+- **Qué faltó:** Dos brechas concretas de producto — (1) un estado/explicación inmediato y en lenguaje claro tras el punto de falla, y (2) soporte accesible que no exija ir a una sucursal.
+- **Impacto en comportamiento:** Erosionó la confianza en la fiabilidad de las transferencias del banco ("puede fallar en cualquier punto, incluso en el paso final"), aunque no lo suficiente para cambiar de banco — porque cambiar es de por sí de alta fricción.
+
+**Aporte a la narrativa SDF:** Afina el Argumento 5 (Confianza / PMF) desde el ángulo de la falla. Refuerza el hallazgo de V-2/V-5 de que el momento de la falla es el killer de confianza — pero añade la dimensión *posterior* a la falla: una explicación clara de estado y una ruta de soporte/disputa sin sucursal son requisitos de producto, no extras. El escrow + estado in-app + ruta de disputa visible de MicoPay responden directamente a este dolor.
+
+---
+
 ## Conclusiones transversales (para el deck ante la SDF)
 
 ### 1. El techo de tarifa es universal: 2–5%
@@ -336,15 +356,16 @@ Las respuestas ya abarcan 6+ países en 3 continentes (LATAM, Sur de Asia, Áfri
 | Issue | Asignado a | PR | Estado |
 |-------|-----------|----|-----------------------------|
 | V-1 · Demanda de cash-out | [@larryjay007](https://github.com/larryjay007) | [#155](https://github.com/ericmt-98/micopay-protocol/pull/155) ✅ | Mergeado — Nigeria (Sur Oeste) |
-| V-2 · Contexto de cash-in / depósito | [@Truphile](https://github.com/Truphile) | [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) ✅ | Mergeado — Nigeria (África Occidental) |
+| V-2 · Contexto de cash-in / depósito | [@Truphile](https://github.com/Truphile) | [#159](https://github.com/ericmt-98/micopay-protocol/pull/159) ✅ | Integrado — Nigeria (África Occidental) |
 | V-3 · Perspectiva del proveedor de liquidez | [@DevSolex](https://github.com/DevSolex) | [#169](https://github.com/ericmt-98/micopay-protocol/pull/169) ✅ | Mergeado — Nigeria (África Occidental) |
 | V-4 · Onboarding a wallet no-custodial | [@Shadow-MMN](https://github.com/Shadow-MMN) | [#157](https://github.com/ericmt-98/micopay-protocol/pull/157) ✅ | Mergeado |
-| V-5 · Confianza en el flujo | [@Truphile](https://github.com/Truphile) | [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) ✅ | Mergeado — Nigeria (África Occidental) |
+| V-5 · Confianza en el flujo | [@Truphile](https://github.com/Truphile) | [#158](https://github.com/ericmt-98/micopay-protocol/pull/158) ✅ | Integrado — Nigeria (África Occidental) |
+| V-11 · Transacción fallida / disputa | [@Chigybillionz](https://github.com/Chigybillionz) | [#174](https://github.com/ericmt-98/micopay-protocol/pull/174) ✅ | Integrado — Nigeria (África Occidental) |
 | V-12 · Vida sin cuenta bancaria | [@Oluwasuyi-Timilehin](https://github.com/Oluwasuyi-Timilehin) | [#173](https://github.com/ericmt-98/micopay-protocol/pull/173) ✅ | Mergeado — México (CDMX) |
-| V-13 · Contexto del remitente | [@Jo-anny](https://github.com/Jo-anny) | [#171](https://github.com/ericmt-98/micopay-protocol/pull/171) ✅ | Mergeado — Europa → LATAM |
-| V-14 · Modelo mental de stablecoin | [@Max-Owolabi](https://github.com/Max-Owolabi) | [#170](https://github.com/ericmt-98/micopay-protocol/pull/170) ✅ | Mergeado — Nigeria (África Occidental) |
+| V-13 · Contexto del remitente | [@Jo-anny](https://github.com/Jo-anny) | [#171](https://github.com/ericmt-98/micopay-protocol/pull/171) ✅ | Integrado — Europa → LATAM |
+| V-14 · Modelo mental de stablecoin | [@Max-Owolabi](https://github.com/Max-Owolabi) | [#175](https://github.com/ericmt-98/micopay-protocol/pull/175) ✅ | Integrado — Nigeria (África Occidental) |
 
-> Los 5 argumentos SDF tienen cobertura. Issues abiertos: V-11, V-15.
+> Los 5 argumentos SDF tienen cobertura. Único issue abierto: V-15 (umbral de confianza de primera vez).
 
 ---
 

@@ -235,7 +235,14 @@ Aggregate signal:
 - Recommendation is strongest when the experience feels safe, simple, and easy to explain to a friend.
 
 ### V-11 · Failed transaction / dispute handling
-_(no responses yet)_
+**Contributor:** [@Chigybillionz](https://github.com/Chigybillionz) · **PR:** [#174](https://github.com/ericmt-98/micopay-protocol/pull/174)
+
+- **Country / general region:** Nigeria (West Africa)
+- **What happened:** Tried to transfer money from a local bank to an online bank to make a purchase. The transfer failed at the very last stage, right after entering the correct OTP verification code — it just returned a failed error instead of completing.
+- **What I did next:** Since the transfer wouldn't go through, I had to find another way. I reached out to my brother, who sent me cash to cover what I was trying to do instead of waiting on the bank.
+- **Resolution and timeframe:** Over a week later, still unresolved. I haven't been able to visit the bank's physical branch to report it, but I plan to if the error keeps happening.
+- **What was missing:** Some way to immediately know what actually went wrong after entering the OTP — even a basic in-app explanation or status check would have saved me from guessing. Easier access to support without physically visiting a branch would also make resolving this far less of a hassle.
+- **How it changed my behavior:** I no longer have full confidence in my local bank's transfer system, since it can fail at any point, even at the final OTP stage. I haven't stopped using the bank entirely — switching banks isn't simple either — but the trust is dented.
 
 ### V-12 · Living unbanked — everyday context
 **Contributor:** [@Oluwasuyi-Timilehin](https://github.com/Oluwasuyi-Timilehin) · **PR:** [#173](https://github.com/ericmt-98/micopay-protocol/pull/173)
@@ -259,7 +266,7 @@ _(no responses yet)_
 - **What would make me switch?:** A cheaper, faster, and more transparent service with a reliable, immediate local cash-out path. The one thing that would have to be better is certainty: knowing the final amount received and the cash-out option before I send.
 
 ### V-14 · Stablecoin / digital peso mental model
-**Contributor:** [@Max-Owolabi](https://github.com/Max-Owolabi) · **PR:** [#170](https://github.com/ericmt-98/micopay-protocol/pull/170)
+**Contributor:** [@Max-Owolabi](https://github.com/Max-Owolabi) · **PR:** [#175](https://github.com/ericmt-98/micopay-protocol/pull/175)
 
 - **Country / general region:** Nigeria (West Africa)
 - **Have you ever held or used a digital stablecoin?:** Yes. I have held and used USDC and USDT on Stellar and other networks. I obtained them by purchasing through local exchange agents or peer-to-peer (P2P) platforms, and I used them to preserve value against local currency inflation and to pay for digital services online where local cards fail.
