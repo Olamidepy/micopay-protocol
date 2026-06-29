@@ -12,6 +12,8 @@ import { serviceRoutes } from "./routes/services.js";
 import { demoRoutes } from "./routes/demo.js";
 import { cetesRoutes } from "./routes/cetes.js";
 import { blendRoutes } from "./routes/blend.js";
+import { kycRoutes } from "./routes/kyc.js";
+import { rampRoutes } from "./routes/ramp.js";
 import { merchantRoutes } from "./routes/merchants.js";
 import { tradeMessagesRoutes } from "./routes/trade-messages.js";
 import { zkRoutes } from "./routes/zk.js";
@@ -51,6 +53,8 @@ export async function createApp() {
   if (config.enableInvestments) {
     app.register(cetesRoutes);
     app.register(blendRoutes);
+    app.register(kycRoutes);
+    app.register(rampRoutes);
   }
 
   app.register(merchantRoutes);
